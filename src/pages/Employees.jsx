@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Plus, Pencil, Trash2, User } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
 import Modal from '../components/Modal'
 
 function EmployeeForm({ initial, onSave, onClose }) {
@@ -119,7 +120,9 @@ function EmployeeForm({ initial, onSave, onClose }) {
 
 export default function Employees() {
   const { employees, leaveTypes, addEmployee, updateEmployee, deleteEmployee } = useApp()
+  const { can } = useAuth()
   const [modal, setModal] = useState(null)
+  const canEdit = can('employees') && !['manager'].includes(useAuth().currentUser?.role)
 
   function handleSave(data) {
     if (modal === 'add') addEmployee(data)
@@ -132,14 +135,18 @@ export default function Employees() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Employees</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage employee profiles and leave allocations</p>
+          <p className="text-sm text-slate-500 mt-1">
+            {canEdit ? 'Manage employee profiles and leave allocations' : 'View employee leave allocations'}
+          </p>
         </div>
-        <button
-          onClick={() => setModal('add')}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={16} /> Add Employee
-        </button>
+        {canEdit && (
+          <button
+            onClick={() => setModal('add')}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            <Plus size={16} /> Add Employee
+          </button>
+        )}
       </div>
 
       {employees.length === 0 ? (
@@ -184,12 +191,14 @@ export default function Employees() {
                   })}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => setModal(emp)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded transition-colors">
-                        <Pencil size={15} />
-                      </button>
-                      <button onClick={() => deleteEmployee(emp.id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded transition-colors">
-                        <Trash2 size={15} />
-                      </button>
+                      {canEdit && (<>
+                        <button onClick={() => setModal(emp)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded transition-colors">
+                          <Pencil size={15} />
+                        </button>
+                        <button onClick={() => deleteEmployee(emp.id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded transition-colors">
+                          <Trash2 size={15} />
+                        </button>
+                      </>)}
                     </div>
                   </td>
                 </tr>
