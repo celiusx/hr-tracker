@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
@@ -9,7 +9,7 @@ import './index.css'
 export default function App() {
   return (
     <AppProvider>
-      <BrowserRouter basename="/hr-tracker">
+      <HashRouter>
         <div className="flex min-h-screen">
           <Sidebar />
           <main className="flex-1 overflow-auto bg-slate-50">
@@ -20,7 +20,7 @@ export default function App() {
             </Routes>
           </main>
         </div>
-      </BrowserRouter>
+      </HashRouter>
     </AppProvider>
   )
 }
