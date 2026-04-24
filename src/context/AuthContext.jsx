@@ -80,6 +80,10 @@ export function AuthProvider({ children }) {
 
   function deleteUser(id) {
     saveUsers(users.filter(u => u.id !== id))
+    if (currentUser?.id === id) {
+      setCurrentUser(null)
+      localStorage.removeItem('currentUser')
+    }
   }
 
   function can(permission) {

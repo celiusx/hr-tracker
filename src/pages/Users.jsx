@@ -100,11 +100,17 @@ function UserForm({ initial, onSave, onClose }) {
 export default function Users() {
   const { users, currentUser, addUser, updateUser, deleteUser } = useAuth()
   const [modal, setModal] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
 
   function handleSave(data) {
     if (modal === 'add') addUser(data)
     else updateUser(data)
     setModal(null)
+  }
+
+  function handleDelete() {
+    deleteUser(confirmDelete.id)
+    setConfirmDelete(null)
   }
 
   return (
@@ -157,11 +163,9 @@ export default function Users() {
                     <button onClick={() => setModal(user)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded transition-colors">
                       <Pencil size={15} />
                     </button>
-                    {user.id !== currentUser?.id && (
-                      <button onClick={() => deleteUser(user.id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded transition-colors">
-                        <Trash2 size={15} />
-                      </button>
-                    )}
+                    <button onClick={() => setConfirmDelete(user)} className="p-1.5 text-slate-400 hover:text-red-600 rounded transition-colors">
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -173,6 +177,27 @@ export default function Users() {
       {modal && (
         <Modal title={modal === 'add' ? 'Add User' : `Edit ${modal.firstName} ${modal.lastName}`} onClose={() => setModal(null)}>
           <UserForm initial={modal === 'add' ? null : modal} onSave={handleSave} onClose={() => setModal(null)} />
+        </Modal>
+      )}
+
+      {confirmDelete && (
+        <Modal title="Delete User" onClose={() => setConfirmDelete(null)}>
+          <p className="text-sm text-slate-600 mb-1">
+            Are you sure you want to delete <span className="font-semibold text-slate-800">{confirmDelete.firstName} {confirmDelete.lastName}</span>?
+          </p>
+          {confirmDelete.id === currentUser?.id && (
+            <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-3">
+              Warning: you are deleting your own account. You will be signed out.
+            </p>
+          )}
+          <div className="flex justify-end gap-2 mt-5">
+            <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:text-slate-900">
+              Cancel
+            </button>
+            <button onClick={handleDelete} className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700">
+              Delete
+            </button>
+          </div>
         </Modal>
       )}
     </div>
