@@ -10,21 +10,26 @@ function UserForm({ initial, onSave, onClose }) {
   const [firstName, setFirstName] = useState(initial?.firstName || '')
   const [lastName, setLastName] = useState(initial?.lastName || '')
   const [username, setUsername] = useState(initial?.username || '')
+  const [email, setEmail] = useState(initial?.email || '')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState(initial?.role || 'employee')
   const [employeeId, setEmployeeId] = useState(initial?.employeeId || '')
   const [usernameError, setUsernameError] = useState('')
+  const [emailError, setEmailError] = useState('')
 
   function handleSubmit(e) {
     e.preventDefault()
-    const duplicate = users.find(u => u.username === username.trim() && u.id !== initial?.id)
-    if (duplicate) { setUsernameError('Username already taken'); return }
+    const dupUsername = users.find(u => u.username === username.trim() && u.id !== initial?.id)
+    if (dupUsername) { setUsernameError('Username already taken'); return }
+    const dupEmail = users.find(u => u.email === email.trim().toLowerCase() && u.id !== initial?.id)
+    if (dupEmail) { setEmailError('Email already in use'); return }
     if (!initial && !password) return
     onSave({
       ...initial,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       username: username.trim(),
+      email: email.trim().toLowerCase(),
       password: password || initial?.password,
       role,
       employeeId: employeeId || null,
@@ -50,6 +55,12 @@ function UserForm({ initial, onSave, onClose }) {
         <input className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={username} onChange={e => { setUsername(e.target.value); setUsernameError('') }} placeholder="johndoe" required />
         {usernameError && <p className="text-xs text-red-500 mt-1">{usernameError}</p>}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+        <input type="email" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={email} onChange={e => { setEmail(e.target.value); setEmailError('') }} placeholder="john@example.com" required />
+        {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -115,6 +126,7 @@ export default function Users() {
             <tr>
               <th className="text-left px-5 py-3 font-medium text-slate-600">Name</th>
               <th className="text-left px-5 py-3 font-medium text-slate-600">Username</th>
+              <th className="text-left px-5 py-3 font-medium text-slate-600">Email</th>
               <th className="text-left px-5 py-3 font-medium text-slate-600">Role</th>
               <th className="px-4 py-3" />
             </tr>
@@ -134,6 +146,7 @@ export default function Users() {
                   </div>
                 </td>
                 <td className="px-5 py-3 text-slate-600 font-mono text-xs">{user.username}</td>
+                <td className="px-5 py-3 text-slate-600 text-xs">{user.email || <span className="text-slate-300">—</span>}</td>
                 <td className="px-5 py-3">
                   <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize ${ROLE_COLORS[user.role]}`}>
                     {user.role}

@@ -8,6 +8,7 @@ const DEFAULT_ADMIN = {
   password: 'admin123',
   firstName: 'Admin',
   lastName: 'User',
+  email: 'admin@hrtracker.com',
   role: 'admin',
   employeeId: null,
 }
